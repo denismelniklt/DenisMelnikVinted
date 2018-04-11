@@ -63,8 +63,8 @@ namespace Application.Tests
             var discount = selectedTransaction.Package.Shipment.Discount;
 
             Assert.IsNotNull(selectedTransaction);
-            Assert.AreEqual(price, 2M);
-            Assert.AreEqual(discount, 0M);
+            Assert.AreEqual(price, 1.90M);
+            Assert.AreEqual(discount, 0.10M);
         }
 
         private void InitializeAutomapper()
