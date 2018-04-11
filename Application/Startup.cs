@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using ITransactionServiceDal = DAL.ITransactionService;
-using ITransactionServiceBll = BLL.ITransactionService;
-using TransactionServiceDal = DAL.TransactionService;
-using TransactionServiceBll = BLL.TransactionService;
 using IShipmentServiceDal = DAL.IShipmentService;
+using ITransactionServiceBll = BLL.ITransactionService;
+using ITransactionServiceDal = DAL.ITransactionService;
 using ShipmentServiceDal = DAL.ShipmentService;
+using TransactionServiceBll = BLL.TransactionService;
+using TransactionServiceDal = DAL.TransactionService;
 
 namespace Application
 {
@@ -30,9 +30,9 @@ namespace Application
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IShipmentServiceDal, ShipmentServiceDal>();
             services.AddTransient<ITransactionServiceDal, TransactionServiceDal>();
             services.AddTransient<ITransactionServiceBll, TransactionServiceBll>();
-            services.AddTransient<IShipmentServiceDal, ShipmentServiceDal>();
 
             services.AddMvc();
         }
