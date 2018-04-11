@@ -1,6 +1,10 @@
-﻿using BLL;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using Infrastructure;
+using AutoMapper;
+using AutoMapper.Mappers;
+using Domain;
+using System.Collections.Generic;
 
 using IShipmentServiceDal = DAL.IShipmentService;
 using ShipmentServiceDal = DAL.ShipmentService;
@@ -8,12 +12,11 @@ using ITransactionServiceDal = DAL.ITransactionService;
 using TransactionServiceDal = DAL.TransactionService;
 using ITransactionServiceBll = BLL.ITransactionService;
 using TransactionServiceBll = BLL.TransactionService;
-using AutoMapper;
-using AutoMapper.Mappers;
+
 
 namespace ApplicationConsole
 {
-    public class Program
+    public class ApplicationConsole
     {
         private const string InputFilePath = "input.txt";
         private static ITransactionServiceBll TransactionServiceBll { get; set; }
@@ -28,8 +31,34 @@ namespace ApplicationConsole
             {
                 inputFilePath = args[0];
             }
-                        
+
             var transactions = TransactionServiceBll.GetTransactions(inputFilePath);
+
+            ShowTransactionsInConsole(transactions);
+
+            Console.ReadKey();
+        }
+
+        private static void ShowTransactionsInConsole(IEnumerable<Transaction> transactions)
+        {
+            var transactionDtos = new List<TransactionDto>();
+
+            foreach (var transaction in transactions)
+            {
+                TransactionDto transactionDto;
+
+                if (transaction is IgnoredTransaction)
+                {
+                    var ignoredTransaction = transaction as IgnoredTransaction;
+                    transactionDto = new IgnoredTransactionDto(ignoredTransaction.TextLine);
+                }
+                else
+                {
+                    transactionDto = Mapper.Map<TransactionDto>(transaction);
+                }
+
+                Console.WriteLine(transactionDto.GetTransactionLine());
+            }
         }
 
         private static void RegisterServices()
