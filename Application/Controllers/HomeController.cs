@@ -1,37 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using BLL;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
-using Application.Models;
+using System.Collections.Generic;
 
 namespace Application.Controllers
 {
     public class HomeController : Controller
     {
+        private ITransactionService TransactionService { get; set; }
+
+        public HomeController(ITransactionService transactionService)
+        {
+            TransactionService = transactionService;
+        }
+
         public IActionResult Index()
         {
-            return View();
-        }
+            var transactions = TransactionService.GetTransactions(ApplicationEnvironment.InputFilePath);
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
+            var transactionDtos = new List<TransactionDto>();
 
-            return View();
-        }
+            foreach (var transaction in transactions)
+            {
+                TransactionDto transactionDto;
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
+                if (transaction is IgnoredTransaction)
+                {
+                    var ignoredTransaction = transaction as IgnoredTransaction;
+                    transactionDto = new IgnoredTransactionDto(ignoredTransaction.TextLine);
+                }
+                else
+                {
+                    transactionDto = Mapper.Map<TransactionDto>(transaction);
+                }
 
-            return View();
-        }
+                transactionDtos.Add(transactionDto);
+            }
 
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(transactionDtos);
         }
     }
 }
